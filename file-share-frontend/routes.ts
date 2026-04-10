@@ -1,19 +1,11 @@
-/**
- * An array of routes that are used for authentication
- * These routes will redirect logged in users to /settings
- * @type { string[] }
- */
+/** Routes accessible to everyone, no login required. */
+export const publicRoutes = ["/", "/share"];
+
+/** Auth routes — redirect logged-in users away to the dashboard. */
 export const authRoutes = ["/login", "/register"];
 
-/**
- * The prefix for API authentication routes
- * Routes that start with this prefix are used for API authentication purposes
- * @type { string }
- */
+/** Prefix for Next-Auth internal API routes. */
 export const apiAuthPrefix = "/api/auth";
 
-/**
- *  The defult redirect path after logging in
- *  @type { string }
- */
+/** Where to send the user after a successful login. */
 export const DEFAULT_LOGIN_REDIRECT = "/upload";

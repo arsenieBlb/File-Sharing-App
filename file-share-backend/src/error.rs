@@ -94,6 +94,13 @@ impl HttpError {
         }
     }
 
+    pub fn not_found(message: impl Into<String>) -> Self {
+        HttpError {
+            message: message.into(),
+            status: StatusCode::NOT_FOUND,
+        }
+    }
+
     pub fn into_http_response(self) -> Response {
         let json_response = Json(ErrorResponse {
             status: "fail".to_string(),

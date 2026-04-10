@@ -216,19 +216,41 @@ pub struct EmailListResponseDto {
     pub emails: Vec<FilterEmailDto>,
 }
 
-#[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct FileUploadDtos {
-    #[validate(email(message = "Invalid email format"))]
+    /// If empty the file is shared via a public anonymous link.
     pub recipient_email: String,
+    pub password: String,
+    pub expiration_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UploadResponseDto {
+    pub status: &'static str,
+    pub message: String,
+    /// Present only for public (anonymous) shares.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub share_token: Option<String>,
+}
+
+#[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct PublicDownloadDto {
+    #[validate(length(min = 1, message = "Token is required"))]
+    pub token: String,
 
     #[validate(
-        length(min = 1, message = "New password is required."),
-        length(min = 6, message = "New password must be at least 6 characters")
+        length(min = 1, message = "Password is required."),
+        length(min = 6, message = "Password must be at least 6 characters")
     )]
     pub password: String,
+}
 
-    #[validate(custom = "validate_expiration_date")]
-    pub expiration_date: String,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PublicShareInfoDto {
+    pub status: String,
+    pub file_name: String,
+    pub sender_name: String,
+    pub expiration_date: chrono::DateTime<chrono::Utc>,
 }
 
 fn validate_expiration_date(expiration_date: &str) -> Result<(), ValidationError> {

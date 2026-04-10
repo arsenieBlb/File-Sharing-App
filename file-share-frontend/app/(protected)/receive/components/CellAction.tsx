@@ -42,7 +42,7 @@ export const CellAction = ({ data, token }: CellActionProps) => {
     const onSubmit = async (values: z.infer<typeof passwordSchema>) => {
         setIsLoading(true)
         try {
-            const response = await fetch('http://localhost:8000/api/file/retrieve', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/file/retrieve`, {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,

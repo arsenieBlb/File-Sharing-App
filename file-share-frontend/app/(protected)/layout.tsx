@@ -9,9 +9,11 @@ const ProtectedLayout = ({
     children: React.ReactNode;
 }>) => {
     return (
-        <div className="h-screen w-full">
+        <div className="flex flex-col min-h-screen w-full">
             <Header />
-            {children}
+            <main className="flex-1 overflow-auto">
+                {children}
+            </main>
         </div>
     )
 }

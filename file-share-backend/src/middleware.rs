@@ -37,15 +37,16 @@ pub async fn auth(
         HttpError::unauthorized(ErrorMessage::TokenNotProvided.to_string())
     })?;
 
-    let token_details = 
+    let token_details =
         match token::decode_token(token, app_state.env.jwt_secret.as_bytes()) {
             Ok(token_details) => token_details,
             Err(_) => {
                 return Err(HttpError::unauthorized(ErrorMessage::InvalidToken.to_string()));
             }
         };
-    
-    let user_id = uuid::Uuid::parse_str(&token_details.to_string()).unwrap();
+
+    let user_id = uuid::Uuid::parse_str(&token_details.to_string())
+        .map_err(|_| HttpError::unauthorized(ErrorMessage::InvalidToken.to_string()))?;
 
     let user = app_state.db_client.get_user(Some(user_id), None, None)
         .await

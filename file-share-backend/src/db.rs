@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
-use crate::models::{File, ReceiveFileDetails, SentFileDetails, SharedLink, User};
+use crate::models::{File, PublicShareInfo, ReceiveFileDetails, SentFileDetails, SharedLink, User};
 
 #[derive(Debug, Clone)]
 pub struct DBClient {
@@ -54,19 +54,30 @@ pub trait UserExt {
         user_id: Uuid,
         file_name: String,
         file_size: i64,
-        recipient_user_id: Uuid,
+        recipient_user_id: Option<Uuid>,
+        public_share_token: Option<Uuid>,
         password: String,
         expiration_date: DateTime<Utc>,
         encrypted_aes_key: Vec<u8>,
         encrypted_file: Vec<u8>,
         iv: Vec<u8>,
-    ) -> Result<(), sqlx::Error>;
+    ) -> Result<Uuid, sqlx::Error>;
 
     async fn get_shared(
         &self,
         shared_id: Uuid,
         user_id: Uuid,
     ) -> Result<Option<SharedLink>, sqlx::Error>;
+
+    async fn get_shared_by_token(
+        &self,
+        token: Uuid,
+    ) -> Result<Option<SharedLink>, sqlx::Error>;
+
+    async fn get_public_share_info(
+        &self,
+        token: Uuid,
+    ) -> Result<Option<PublicShareInfo>, sqlx::Error>;
 
     async fn get_file(
         &self,
@@ -235,14 +246,14 @@ impl UserExt for DBClient {
         user_id: Uuid,
         file_name: String,
         file_size: i64,
-        recipient_user_ud: Uuid,
+        recipient_user_id: Option<Uuid>,
+        public_share_token: Option<Uuid>,
         password: String,
         expiration_date: DateTime<Utc>,
         encrypted_aes_key: Vec<u8>,
         encrypted_file: Vec<u8>,
         iv: Vec<u8>,
-    ) -> Result<(), sqlx::Error> {
-        // Insert into the files table and get the file_id
+    ) -> Result<Uuid, sqlx::Error> {
         let file_id: Uuid = sqlx::query_scalar!(
             r#"
             INSERT INTO files (user_id, file_name, file_size, encrypted_aes_key, encrypted_file, iv, created_at)
@@ -259,21 +270,21 @@ impl UserExt for DBClient {
         .fetch_one(&self.pool)
         .await?;
 
-        // Insert into the shared_links table using the returned file_id
         sqlx::query!(
             r#"
-            INSERT INTO shared_links (file_id, recipient_user_id, password, expiration_date, created_at)
-            VALUES ($1, $2, $3, $4, NOW())
+            INSERT INTO shared_links (file_id, recipient_user_id, public_share_token, password, expiration_date, created_at)
+            VALUES ($1, $2, $3, $4, $5, NOW())
             "#,
             file_id,
-            recipient_user_ud,
+            recipient_user_id,
+            public_share_token,
             password,
             expiration_date
         )
         .execute(&self.pool)
         .await?;
 
-        Ok(())
+        Ok(file_id)
     }
 
     async fn get_shared(
@@ -284,7 +295,7 @@ impl UserExt for DBClient {
         let shared_link = sqlx::query_as!(
             SharedLink,
             r#"
-            SELECT id, file_id, recipient_user_id, password, expiration_date, created_at
+            SELECT id, file_id, recipient_user_id, public_share_token, password, expiration_date, created_at
             FROM shared_links
             WHERE id = $1
             AND recipient_user_id = $2
@@ -297,6 +308,48 @@ impl UserExt for DBClient {
         .await?;
 
         Ok(shared_link)
+    }
+
+    async fn get_shared_by_token(
+        &self,
+        token: Uuid,
+    ) -> Result<Option<SharedLink>, sqlx::Error> {
+        let shared_link = sqlx::query_as!(
+            SharedLink,
+            r#"
+            SELECT id, file_id, recipient_user_id, public_share_token, password, expiration_date, created_at
+            FROM shared_links
+            WHERE public_share_token = $1
+            AND expiration_date > NOW()
+            "#,
+            token,
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(shared_link)
+    }
+
+    async fn get_public_share_info(
+        &self,
+        token: Uuid,
+    ) -> Result<Option<PublicShareInfo>, sqlx::Error> {
+        let info = sqlx::query_as!(
+            PublicShareInfo,
+            r#"
+            SELECT f.file_name, sl.expiration_date, u.name AS sender_name
+            FROM shared_links sl
+            JOIN files f ON sl.file_id = f.id
+            JOIN users u ON f.user_id = u.id
+            WHERE sl.public_share_token = $1
+            AND sl.expiration_date > NOW()
+            "#,
+            token,
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(info)
     }
 
     async fn get_file(

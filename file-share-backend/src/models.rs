@@ -29,9 +29,17 @@ pub struct SharedLink {
     pub id: uuid::Uuid,
     pub file_id: Option<uuid::Uuid>,
     pub recipient_user_id: Option<uuid::Uuid>,
+    pub public_share_token: Option<uuid::Uuid>,
     pub password: String,
     pub expiration_date: Option<DateTime<Utc>>,
     pub created_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, sqlx::FromRow)]
+pub struct PublicShareInfo {
+    pub file_name: String,
+    pub expiration_date: Option<DateTime<Utc>>,
+    pub sender_name: String,
 }
 
 #[derive(sqlx::FromRow)]
