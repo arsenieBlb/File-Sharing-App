@@ -25,9 +25,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { AtmosphericBackground } from "@/components/shell/AtmosphericBackground";
+import { cn } from "@/lib/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -55,8 +56,13 @@ export function PublicDownload({ token }: { token: string }) {
   // Fetch share info on mount
   useEffect(() => {
     (async () => {
+      if (!API_URL) {
+        setExpired(true);
+        setLoading(false);
+        return;
+      }
       try {
-        const res = await fetch(`${API_URL}/share/${token}`);
+        const res = await fetch(`${API_URL}/share/${encodeURIComponent(token)}`);
         if (res.status === 404) {
           setExpired(true);
           return;
@@ -66,7 +72,22 @@ export function PublicDownload({ token }: { token: string }) {
           return;
         }
         const data = await res.json();
-        setInfo(data);
+        if (data.status === "fail" || typeof data.file_name !== "string") {
+          setExpired(true);
+          return;
+        }
+        const exp =
+          typeof data.expiration_date === "string"
+            ? data.expiration_date
+            : data.expiration_date != null
+              ? String(data.expiration_date)
+              : "";
+        setInfo({
+          file_name: data.file_name,
+          sender_name:
+            typeof data.sender_name === "string" ? data.sender_name : "",
+          expiration_date: exp,
+        });
       } catch {
         setExpired(true);
       } finally {
@@ -78,11 +99,18 @@ export function PublicDownload({ token }: { token: string }) {
   const onSubmit = async (values: z.infer<typeof passwordSchema>) => {
     setIsDownloading(true);
     try {
-      const res = await fetch(`${API_URL}/share/${token}/download`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password: values.password }),
-      });
+      if (!API_URL) {
+        toast.error("API URL is not configured.");
+        return;
+      }
+      const res = await fetch(
+        `${API_URL}/share/${encodeURIComponent(token)}/download`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, password: values.password }),
+        }
+      );
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ message: "Download failed" }));
@@ -114,6 +142,7 @@ export function PublicDownload({ token }: { token: string }) {
       <PageWrapper>
         <Card className="w-full max-w-md border-white/10 bg-white/[0.07] shadow-2xl backdrop-blur-xl">
           <CardContent className="p-10 text-center text-muted-foreground">
+            <ShareBrandHomeLink className="mb-6" />
             <div className="mx-auto mb-4 h-8 w-8 animate-pulse rounded-full bg-primary/30" />
             Loading share info…
           </CardContent>
@@ -127,6 +156,7 @@ export function PublicDownload({ token }: { token: string }) {
       <PageWrapper>
         <Card className="w-full max-w-md border-white/10 bg-white/[0.07] shadow-2xl backdrop-blur-xl">
           <CardContent className="space-y-4 p-10 text-center">
+            <ShareBrandHomeLink className="mb-2" />
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/30 text-2xl">
               ⏰
             </div>
@@ -152,12 +182,7 @@ export function PublicDownload({ token }: { token: string }) {
     <PageWrapper>
       <Card className="w-full max-w-md overflow-hidden border-white/10 bg-white/[0.07] shadow-2xl backdrop-blur-xl">
         <CardHeader className="space-y-3 pb-4 pt-8 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-lg shadow-primary/25">
-            <ShieldCheckIcon className="h-7 w-7" strokeWidth={2.25} />
-          </div>
-          <CardTitle className="text-xl font-semibold tracking-tight">
-            SecureShare
-          </CardTitle>
+          <ShareBrandHomeLink />
           <p className="text-sm text-muted-foreground">
             Someone shared a file with you
           </p>
@@ -233,6 +258,25 @@ export function PublicDownload({ token }: { token: string }) {
 }
 
 // ── Small helpers ─────────────────────────────────────────────────────────────
+
+function ShareBrandHomeLink({ className }: { className?: string }) {
+  return (
+    <Link
+      href="/"
+      className={cn(
+        "group mx-auto flex flex-col items-center gap-2 rounded-xl p-1 text-center outline-none ring-offset-background transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        className
+      )}
+    >
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-lg shadow-primary/25 transition-transform group-hover:scale-[1.02]">
+        <ShieldCheckIcon className="h-7 w-7" strokeWidth={2.25} />
+      </span>
+      <span className="text-xl font-semibold tracking-tight text-foreground">
+        SecureShare
+      </span>
+    </Link>
+  );
+}
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (

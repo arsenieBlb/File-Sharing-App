@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use axum::{middleware, Extension, Router};
+use axum::{extract::DefaultBodyLimit, middleware, Extension, Router};
 use tower_http::trace::TraceLayer;
 
 use crate::{
@@ -21,7 +21,13 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
         .merge(public_share_handle())
         // Protected: JWT required
         .nest("/users", users_handler().layer(middleware::from_fn(auth)))
-        .nest("/file", file_handle().layer(middleware::from_fn(auth)))
+        // Default axum body limit is 2 MB; allow ~4 MB files plus multipart overhead.
+        .nest(
+            "/file",
+            file_handle()
+                .layer(DefaultBodyLimit::max(12 * 1024 * 1024))
+                .layer(middleware::from_fn(auth)),
+        )
         .nest("/list", get_file_list_handler().layer(middleware::from_fn(auth)))
         .layer(TraceLayer::new_for_http())
         .layer(Extension(app_state));

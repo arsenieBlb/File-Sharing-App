@@ -184,6 +184,10 @@ export const UploadNew = ({ token }: { token: string | null }) => {
   };
 
   const onSubmit = async (values: FormValues) => {
+    if (!API_URL) {
+      toast.error("API URL is not configured (NEXT_PUBLIC_API_URL).");
+      return;
+    }
     setIsPending(true);
     try {
       const formData = new FormData();
@@ -198,17 +202,28 @@ export const UploadNew = ({ token }: { token: string | null }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const result = await response.json();
+      let result: { message?: string; share_token?: string; status?: string } =
+        {};
+      try {
+        result = await response.json();
+      } catch {
+        toast.error(
+          response.status === 413
+            ? "File or request is too large for the server."
+            : "Upload failed (invalid response)."
+        );
+        return;
+      }
 
       if (!response.ok) {
-        toast.error(result.message || "Upload failed");
+        toast.error(result.message || `Upload failed (${response.status})`);
         return;
       }
 
       if (result.share_token) {
         setShareToken(result.share_token);
       } else {
-        toast.success(result.message);
+        toast.success(result.message ?? "Upload complete.");
         router.push("/upload");
       }
     } catch {
@@ -231,12 +246,12 @@ export const UploadNew = ({ token }: { token: string | null }) => {
       )}
 
       <Card className="overflow-hidden border-border/80 shadow-md dark:border-white/10">
-        <CardHeader className="space-y-1 pb-4">
-          <CardTitle className="text-xl font-semibold tracking-tight">
-            Upload a file
+        <CardHeader className="space-y-1 border-b border-border/60 bg-muted/20 pb-4 pt-5 dark:border-white/10 dark:bg-white/[0.03] sm:px-6">
+          <CardTitle className="text-lg font-semibold tracking-tight">
+            File & delivery
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Choose who can access it and set a password plus expiry.
+            Pick a recipient or a public link, then set password and expiry.
           </p>
         </CardHeader>
         <Separator />

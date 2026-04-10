@@ -29,6 +29,31 @@ use crate::{
 const MAX_FILE_SIZE: usize = 4 * 1024 * 1024; // 4 MB
 const ALLOWED_MIME_TYPES: &[&str] = &["image/jpeg", "image/png", "image/jpg", "application/pdf"];
 
+/// Browsers often omit the part Content-Type or send application/octet-stream; infer from filename.
+fn effective_mime_type(raw_mime: &str, file_name: &str) -> String {
+    let m = raw_mime.trim().to_lowercase();
+    if ALLOWED_MIME_TYPES.contains(&m.as_str()) {
+        return m;
+    }
+    if m.is_empty() || m == "application/octet-stream" {
+        if let Some(ext) = std::path::Path::new(file_name)
+            .extension()
+            .and_then(|e| e.to_str())
+        {
+            let inferred = match ext.to_lowercase().as_str() {
+                "jpg" | "jpeg" => Some("image/jpeg"),
+                "png" => Some("image/png"),
+                "pdf" => Some("application/pdf"),
+                _ => None,
+            };
+            if let Some(mt) = inferred {
+                return mt.to_string();
+            }
+        }
+    }
+    m
+}
+
 pub fn file_handle() -> Router {
     Router::new()
         .route("/upload", post(upload_file))
@@ -111,6 +136,7 @@ pub async fn upload_file(
     if file_data.len() > MAX_FILE_SIZE {
         return Err(HttpError::bad_request("File exceeds the 4 MB size limit"));
     }
+    let file_mime = effective_mime_type(&file_mime, &file_name);
     if !ALLOWED_MIME_TYPES.contains(&file_mime.as_str()) {
         return Err(HttpError::bad_request(
             "Only JPG, PNG, and PDF files are allowed",
