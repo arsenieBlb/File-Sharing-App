@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ShieldCheckIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { cn } from "@/lib/utils";
@@ -18,19 +19,36 @@ export const AuthCard = ({
   backButtonLabel,
   children,
   headerLabel,
-  className
+  className,
 }: AuthCardProps) => {
   return (
-    <Card className={cn("w-[400px] shadow-md",  className)}>
-      <CardHeader>
-        <div className="w-full flex flex-col gap-y-4 items-center justify-center">
-          <h1 className="text-3xl font-semibold">🔐SecureShare</h1>
-          <p className="text-muted-foreground text-sm">{headerLabel}</p>
+    <Card
+      className={cn(
+        "w-full max-w-[400px] border-white/10 bg-white/[0.07] shadow-2xl shadow-black/40 backdrop-blur-xl",
+        className
+      )}
+    >
+      <CardHeader className="space-y-0 pb-2 pt-8">
+        <div className="flex flex-col items-center gap-4">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-lg shadow-primary/30">
+            <ShieldCheckIcon className="h-7 w-7" strokeWidth={2.25} />
+          </span>
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              SecureShare
+            </h1>
+            <p className="mt-1.5 text-sm text-muted-foreground">{headerLabel}</p>
+          </div>
         </div>
       </CardHeader>
-      <CardContent>{children}</CardContent>
-      <CardFooter>
-        <Button variant="link" className="font-normal w-full" size="sm" asChild>
+      <CardContent className="px-6 pb-2 pt-4">{children}</CardContent>
+      <CardFooter className="flex flex-col gap-2 pb-8 pt-2">
+        <Button
+          variant="link"
+          className="h-auto w-full font-normal text-muted-foreground hover:text-foreground"
+          size="sm"
+          asChild
+        >
           <Link href={backButtonHref}>{backButtonLabel}</Link>
         </Button>
       </CardFooter>

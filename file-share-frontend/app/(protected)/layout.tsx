@@ -11,7 +11,7 @@ const ProtectedLayout = ({
     return (
         <div className="flex flex-col min-h-screen w-full">
             <Header />
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-auto bg-muted/25">
                 {children}
             </main>
         </div>

@@ -13,7 +13,7 @@ import { LoginApi } from "@/actions/auth";
 import toast from "react-hot-toast";
 
 export const LoginForm = () => {
-    const [isPanding, startTransistion] = useTransition();
+    const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -24,7 +24,7 @@ export const LoginForm = () => {
     })
 
     const onSubmit = (values: z.infer<typeof loginSchema>) => {
-        startTransistion(() => {
+        startTransition(() => {
             LoginApi(values)
                 .then((response) => {
                     if(response?.error) {
@@ -57,7 +57,7 @@ export const LoginForm = () => {
                                             {...field}
                                             placeholder="john.doe@example.com"
                                             type="email"
-                                            disabled={isPanding}
+                                            disabled={isPending}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -75,7 +75,7 @@ export const LoginForm = () => {
                                             {...field}
                                             placeholder="********"
                                             type="password"
-                                            disabled={isPanding}
+                                            disabled={isPending}
                                             enablePasswordToggle
                                         />
                                     </FormControl>
@@ -84,7 +84,7 @@ export const LoginForm = () => {
                             )}
                         />
                     </div>
-                    <Button type="submit" isLoading={isPanding} className="w-full">
+                    <Button type="submit" isLoading={isPending} className="w-full rounded-full shadow-md shadow-primary/15">
                         Login
                     </Button>
                 </form>

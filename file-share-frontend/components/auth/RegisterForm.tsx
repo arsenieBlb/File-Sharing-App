@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 export const RegisterForm = () => {
-  const [isPanding, startTransistion] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
@@ -28,7 +28,7 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof registerSchema>) => {
-    startTransistion(() => {
+    startTransition(() => {
       RegisterApi(values).then((response) => {
         if (response.status === 400) {
           toast.error(response.message);
@@ -67,7 +67,7 @@ export const RegisterForm = () => {
                         {...field}
                         placeholder="john doe"
                         type="text"
-                        disabled={isPanding}
+                        disabled={isPending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -87,7 +87,7 @@ export const RegisterForm = () => {
                         {...field}
                         placeholder="john.doe@example.com"
                         type="email"
-                        disabled={isPanding}
+                        disabled={isPending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -109,7 +109,7 @@ export const RegisterForm = () => {
                         {...field}
                         placeholder="********"
                         type="password"
-                        disabled={isPanding}
+                        disabled={isPending}
                         enablePasswordToggle
                       />
                     </FormControl>
@@ -130,7 +130,7 @@ export const RegisterForm = () => {
                         {...field}
                         placeholder="********"
                         type="password"
-                        disabled={isPanding}
+                        disabled={isPending}
                         enablePasswordToggle
                       />
                     </FormControl>
@@ -140,7 +140,7 @@ export const RegisterForm = () => {
               />
             </div>
           </div>
-          <Button type="submit" isLoading={isPanding} className="w-full">
+          <Button type="submit" isLoading={isPending} className="w-full rounded-full shadow-md shadow-primary/15">
             Create an account
           </Button>
         </form>

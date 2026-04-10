@@ -96,24 +96,33 @@ function ShareLinkModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl p-6 w-full max-w-md space-y-4">
-        <h2 className="text-lg font-semibold">Your share link is ready!</h2>
-        <p className="text-sm text-muted-foreground">
-          Send this link to anyone. They will need the file password to
-          download.
-        </p>
-        <div className="flex items-center gap-2 rounded-md border px-3 py-2 bg-muted text-sm break-all">
-          <span className="flex-1">{shareUrl}</span>
-          <button onClick={copy} className="shrink-0 text-muted-foreground hover:text-foreground">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md space-y-5 rounded-2xl border border-border bg-card p-6 shadow-2xl dark:border-white/10 dark:bg-zinc-900/95">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">
+            Your share link is ready
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Send this link to anyone. They will need the file password to
+            download.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2.5 text-sm break-all dark:border-white/10 dark:bg-white/5">
+          <span className="flex-1 font-mono text-xs sm:text-sm">{shareUrl}</span>
+          <button
+            type="button"
+            onClick={copy}
+            className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Copy link"
+          >
             {copied ? (
-              <CheckIcon className="h-4 w-4 text-green-500" />
+              <CheckIcon className="h-4 w-4 text-emerald-500" />
             ) : (
               <CopyIcon className="h-4 w-4" />
             )}
           </button>
         </div>
-        <Button className="w-full" onClick={onClose}>
+        <Button className="w-full rounded-full" onClick={onClose}>
           Done
         </Button>
       </div>
@@ -221,25 +230,30 @@ export const UploadNew = ({ token }: { token: string | null }) => {
         />
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload new File</CardTitle>
+      <Card className="overflow-hidden border-border/80 shadow-md dark:border-white/10">
+        <CardHeader className="space-y-1 pb-4">
+          <CardTitle className="text-xl font-semibold tracking-tight">
+            Upload a file
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Choose who can access it and set a password plus expiry.
+          </p>
         </CardHeader>
         <Separator />
-        <CardContent className="p-4">
+        <CardContent className="p-4 sm:p-6">
           <Form {...form}>
-            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
 
               {/* Share mode toggle */}
-              <div className="flex rounded-lg border overflow-hidden">
+              <div className="flex rounded-full border border-border bg-muted/40 p-1 dark:border-white/10 dark:bg-white/5">
                 <button
                   type="button"
                   onClick={() => form.setValue("mode", "registered")}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-2 text-sm transition-colors",
+                    "flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-medium transition-all",
                     mode === "registered"
-                      ? "bg-slate-900 text-white"
-                      : "bg-background text-muted-foreground hover:bg-muted"
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   <UserIcon className="h-4 w-4" /> Share with user
@@ -248,13 +262,13 @@ export const UploadNew = ({ token }: { token: string | null }) => {
                   type="button"
                   onClick={() => form.setValue("mode", "public")}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-2 text-sm transition-colors",
+                    "flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-medium transition-all",
                     mode === "public"
-                      ? "bg-slate-900 text-white"
-                      : "bg-background text-muted-foreground hover:bg-muted"
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <LinkIcon className="h-4 w-4" /> Create public link
+                  <LinkIcon className="h-4 w-4" /> Public link
                 </button>
               </div>
 
@@ -305,8 +319,9 @@ export const UploadNew = ({ token }: { token: string | null }) => {
               )}
 
               {mode === "public" && (
-                <p className="rounded-md border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 px-3 py-2 text-sm text-blue-700 dark:text-blue-300">
-                  A link will be generated that anyone can use to download your file using the password below.
+                <p className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm text-foreground/90 dark:border-primary/30 dark:bg-primary/10">
+                  A link will be generated that anyone can use to download your
+                  file using the password below.
                 </p>
               )}
 
@@ -390,8 +405,12 @@ export const UploadNew = ({ token }: { token: string | null }) => {
                 )}
               />
 
-              <Button type="submit" className="w-full" isLoading={isPending}>
-                {mode === "public" ? "Upload & Generate Link" : "Upload File"}
+              <Button
+                type="submit"
+                className="w-full rounded-full shadow-md shadow-primary/15"
+                isLoading={isPending}
+              >
+                {mode === "public" ? "Upload & generate link" : "Upload file"}
               </Button>
             </form>
           </Form>

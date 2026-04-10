@@ -5,7 +5,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
-import { DownloadIcon, LockIcon, TimerIcon, UserIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  LockIcon,
+  ShieldCheckIcon,
+  TimerIcon,
+  UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -21,6 +27,7 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { AtmosphericBackground } from "@/components/shell/AtmosphericBackground";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -105,8 +112,9 @@ export function PublicDownload({ token }: { token: string }) {
   if (loading) {
     return (
       <PageWrapper>
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center text-muted-foreground">
+        <Card className="w-full max-w-md border-white/10 bg-white/[0.07] shadow-2xl backdrop-blur-xl">
+          <CardContent className="p-10 text-center text-muted-foreground">
+            <div className="mx-auto mb-4 h-8 w-8 animate-pulse rounded-full bg-primary/30" />
             Loading share info…
           </CardContent>
         </Card>
@@ -117,15 +125,19 @@ export function PublicDownload({ token }: { token: string }) {
   if (expired || !info) {
     return (
       <PageWrapper>
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center space-y-3">
-            <p className="text-2xl">⏰</p>
-            <h2 className="font-semibold text-lg">Link expired or not found</h2>
-            <p className="text-muted-foreground text-sm">
+        <Card className="w-full max-w-md border-white/10 bg-white/[0.07] shadow-2xl backdrop-blur-xl">
+          <CardContent className="space-y-4 p-10 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/30 text-2xl">
+              ⏰
+            </div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Link expired or not found
+            </h2>
+            <p className="text-sm text-muted-foreground">
               This share link has expired, was already deleted, or does not
               exist.
             </p>
-            <Button asChild variant="outline" className="mt-4">
+            <Button asChild variant="secondary" className="mt-2 rounded-full">
               <Link href="/">Go to SecureShare</Link>
             </Button>
           </CardContent>
@@ -138,18 +150,22 @@ export function PublicDownload({ token }: { token: string }) {
 
   return (
     <PageWrapper>
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="text-center space-y-1">
-          <p className="text-3xl">🔐</p>
-          <CardTitle className="text-xl">SecureShare</CardTitle>
-          <p className="text-muted-foreground text-sm">
+      <Card className="w-full max-w-md overflow-hidden border-white/10 bg-white/[0.07] shadow-2xl backdrop-blur-xl">
+        <CardHeader className="space-y-3 pb-4 pt-8 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-lg shadow-primary/25">
+            <ShieldCheckIcon className="h-7 w-7" strokeWidth={2.25} />
+          </div>
+          <CardTitle className="text-xl font-semibold tracking-tight">
+            SecureShare
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
             Someone shared a file with you
           </p>
         </CardHeader>
-        <Separator />
-        <CardContent className="p-6 space-y-5">
+        <Separator className="bg-white/10" />
+        <CardContent className="space-y-5 p-6">
           {/* File info */}
-          <div className="rounded-lg border bg-muted/40 p-4 space-y-2 text-sm">
+          <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm">
             <InfoRow
               icon={<DownloadIcon className="h-4 w-4" />}
               label="File"
@@ -195,11 +211,11 @@ export function PublicDownload({ token }: { token: string }) {
               />
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full rounded-full shadow-lg shadow-primary/20"
                 isLoading={isDownloading}
               >
-                <DownloadIcon className="h-4 w-4 mr-2" />
-                Download File
+                <DownloadIcon className="mr-2 h-4 w-4" />
+                Download file
               </Button>
             </form>
           </Form>
@@ -220,9 +236,11 @@ export function PublicDownload({ token }: { token: string }) {
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800 px-4 py-12">
-      {children}
-    </div>
+    <AtmosphericBackground>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+        {children}
+      </div>
+    </AtmosphericBackground>
   );
 }
 
