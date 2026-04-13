@@ -42,9 +42,7 @@ export const Userprofile = ({ userData }: { userData: UserDataProps }) => {
             toast.success("Name updated successfully.");
           }
         })
-        .catch((error) => {
-          console.log(error);
-        });
+                .catch(() => {});
     });
   };
 

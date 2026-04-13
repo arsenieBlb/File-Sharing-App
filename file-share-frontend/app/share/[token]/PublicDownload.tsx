@@ -29,6 +29,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { AtmosphericBackground } from "@/components/shell/AtmosphericBackground";
 import { cn } from "@/lib/utils";
+import { APP_NAME } from "@/lib/brand";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -168,7 +169,7 @@ export function PublicDownload({ token }: { token: string }) {
               exist.
             </p>
             <Button asChild variant="secondary" className="mt-2 rounded-full">
-              <Link href="/">Go to SecureShare</Link>
+              <Link href="/">Back to home</Link>
             </Button>
           </CardContent>
         </Card>
@@ -246,7 +247,7 @@ export function PublicDownload({ token }: { token: string }) {
           </Form>
 
           <p className="text-xs text-center text-muted-foreground">
-            This file is end-to-end encrypted.{" "}
+            Stored encrypted and protected by your password.{" "}
             <Link href="/" className="underline">
               Learn more
             </Link>
@@ -271,8 +272,8 @@ function ShareBrandHomeLink({ className }: { className?: string }) {
       <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-lg shadow-primary/25 transition-transform group-hover:scale-[1.02]">
         <ShieldCheckIcon className="h-7 w-7" strokeWidth={2.25} />
       </span>
-      <span className="text-xl font-semibold tracking-tight text-foreground">
-        SecureShare
+      <span className="text-balance text-lg font-semibold leading-tight tracking-tight text-foreground sm:text-xl">
+        {APP_NAME}
       </span>
     </Link>
   );

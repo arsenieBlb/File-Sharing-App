@@ -5,6 +5,7 @@ import { ShieldCheckIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { cn } from "@/lib/utils";
+import { APP_NAME } from "@/lib/brand";
 
 interface AuthCardProps {
   children: React.ReactNode;
@@ -34,8 +35,8 @@ export const AuthCard = ({
             <ShieldCheckIcon className="h-7 w-7" strokeWidth={2.25} />
           </span>
           <div className="text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              SecureShare
+            <h1 className="text-balance text-2xl font-semibold leading-tight tracking-tight text-foreground">
+              {APP_NAME}
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">{headerLabel}</p>
           </div>

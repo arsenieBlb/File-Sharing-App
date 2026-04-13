@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "next-themes";
+import { APP_NAME, APP_NAME_SLUG, APP_TAGLINE } from "@/lib/brand";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,8 +17,11 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "SecureShare — End-to-End Encrypted File Sharing",
-  description: "Share files securely with end-to-end encryption, password protection, and automatic expiry.",
+  title: {
+    default: `${APP_NAME} — password-protected sharing`,
+    template: `%s | ${APP_NAME}`,
+  },
+  description: `${APP_TAGLINE} Official project name: ${APP_NAME_SLUG}.`,
 };
 
 export default function RootLayout({
@@ -30,14 +34,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-      >
-        <Toaster />
-        {children}
-      </ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Toaster />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

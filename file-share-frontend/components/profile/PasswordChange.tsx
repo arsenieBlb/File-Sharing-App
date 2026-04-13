@@ -47,9 +47,7 @@ export const PasswordChange = () => {
             });
           }
         })
-        .catch((error) => {
-          console.log(error);
-        });
+                .catch(() => {});
     });
   };
 

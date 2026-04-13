@@ -5,6 +5,7 @@ import { LogoutButton } from "../auth/LogoutButton";
 import { usePathname } from "next/navigation";
 import { ShieldCheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { APP_NAME_SHORT } from "@/lib/brand";
 
 const navLinks = [
   { href: "/upload", label: "My uploads" },
@@ -25,7 +26,9 @@ export const Header = () => {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-md shadow-primary/20 transition-transform group-hover:scale-[1.02]">
             <ShieldCheckIcon className="h-4 w-4" strokeWidth={2.5} />
           </span>
-          <span className="text-base sm:text-lg">SecureShare</span>
+          <span className="max-w-[10rem] truncate text-sm font-semibold sm:max-w-none sm:text-base">
+            {APP_NAME_SHORT}
+          </span>
         </Link>
 
         <nav className="flex flex-1 items-center justify-center gap-0.5 sm:gap-1">

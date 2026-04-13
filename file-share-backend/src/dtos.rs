@@ -1,7 +1,6 @@
-use core::str;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use validator::{Validate, ValidationError};
+use validator::Validate;
 
 use crate::models::{ReceiveFileDetails, SentFileDetails, User};
 
@@ -216,14 +215,6 @@ pub struct EmailListResponseDto {
     pub emails: Vec<FilterEmailDto>,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct FileUploadDtos {
-    /// If empty the file is shared via a public anonymous link.
-    pub recipient_email: String,
-    pub password: String,
-    pub expiration_date: String,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UploadResponseDto {
     pub status: &'static str,
@@ -250,32 +241,7 @@ pub struct PublicShareInfoDto {
     pub status: String,
     pub file_name: String,
     pub sender_name: String,
-    pub expiration_date: chrono::DateTime<chrono::Utc>,
-}
-
-fn validate_expiration_date(expiration_date: &str) -> Result<(), ValidationError> {
-    if expiration_date.is_empty() {
-        let mut error = ValidationError::new("expiration_date_required");
-        error.message = Some("Expiration date is required.".into());
-        return Err(error);
-    }
-
-    let parsed_date = DateTime::parse_from_rfc3339(expiration_date)
-    .map_err(|_| {
-        let mut error = ValidationError::new("invalid_date_format");
-        error.message = Some("Invalid date format. Expected format is YYYY-MM-DDTHH:MM:SS.ssssssZ.".into());
-        error
-    })?;
-
-    let now = Utc::now();
-
-    if parsed_date <= now {
-        let mut error = ValidationError::new("expiration_date_future");
-        error.message = Some("Expiration date must be in the future.".into());
-        return Err(error);
-    }
-
-    Ok(())
+    pub expiration_date: DateTime<Utc>,
 }
 
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]

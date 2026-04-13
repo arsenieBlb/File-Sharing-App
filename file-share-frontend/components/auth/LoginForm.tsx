@@ -31,9 +31,7 @@ export const LoginForm = () => {
                         toast.error(response.error);
                     }
                 })
-                .catch((error) => {
-                    console.log(error);
-                })
+                .catch(() => {})
         })
     }
 

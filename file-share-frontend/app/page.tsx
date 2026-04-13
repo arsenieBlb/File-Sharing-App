@@ -3,11 +3,17 @@ import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRightIcon,
+  CheckCircle2Icon,
   LinkIcon,
   LockIcon,
   ShieldCheckIcon,
   TimerIcon,
 } from "lucide-react";
+import {
+  APP_DESCRIPTION_NON_TECH,
+  APP_NAME,
+  APP_NAME_SLUG,
+} from "@/lib/brand";
 
 export default async function LandingPage() {
   const session = await auth();
@@ -33,7 +39,9 @@ export default async function LandingPage() {
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-lg shadow-primary/25 transition-transform group-hover:scale-[1.02]">
               <ShieldCheckIcon className="h-5 w-5" strokeWidth={2.25} />
             </span>
-            <span className="text-lg">SecureShare</span>
+            <span className="max-w-[11rem] truncate text-base font-semibold sm:max-w-none sm:text-lg">
+              {APP_NAME}
+            </span>
           </Link>
           <nav className="flex items-center gap-2">
             {isLoggedIn ? (
@@ -67,7 +75,7 @@ export default async function LandingPage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
-              End-to-end encrypted file sharing
+              Password-protected sharing · JPG, PNG, PDF · up to 4 MB
             </p>
             <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl md:leading-[1.1]">
               Send files{" "}
@@ -75,9 +83,15 @@ export default async function LandingPage() {
                 without leaving traces
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-pretty text-lg text-muted-foreground sm:text-xl">
-              Password-protected links, automatic expiry, and encryption before
-              upload — recipients can download without an account.
+            <p className="mx-auto mt-4 text-sm font-medium text-foreground/90">
+              {APP_NAME}{" "}
+              <span className="text-muted-foreground">
+                (<span className="font-mono text-xs">{APP_NAME_SLUG}</span>)
+              </span>
+            </p>
+            <p className="mx-auto mt-4 max-w-xl text-pretty text-lg text-muted-foreground sm:text-xl">
+              Password-protected links, automatic expiry, and encrypted storage
+              — recipients can use a public link without creating an account.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               {isLoggedIn ? (
@@ -117,7 +131,7 @@ export default async function LandingPage() {
                       Secure link
                     </p>
                     <p className="mt-1 font-mono text-sm text-foreground/90">
-                      secureshare.app/share/••••••••
+                      your-site.com/share/••••••••
                     </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary">
@@ -143,6 +157,26 @@ export default async function LandingPage() {
           </div>
         </section>
 
+        <section className="border-t border-border/60 bg-muted/30 py-16 dark:bg-white/[0.02]">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6">
+            <h2 className="text-center text-2xl font-bold tracking-tight sm:text-3xl">
+              Not in IT? Here&apos;s what to expect
+            </h2>
+            <p className="mx-auto mt-3 text-center text-muted-foreground">
+              No command line, no VPN, and no security certifications required —
+              just a browser and a few minutes.
+            </p>
+            <ul className="mt-8 space-y-4 text-left text-foreground/95">
+              {APP_DESCRIPTION_NON_TECH.map((line) => (
+                <li key={line} className="flex gap-3 text-sm leading-relaxed sm:text-base">
+                  <CheckCircle2Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         <section className="border-t border-border/60 bg-muted/30 py-20 dark:bg-white/[0.02]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="mx-auto max-w-2xl text-center">
@@ -156,8 +190,8 @@ export default async function LandingPage() {
             <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <FeatureCard
                 icon={<LockIcon className="h-6 w-6" />}
-                title="Encrypted in transit"
-                description="Files are encrypted in the browser with AES and RSA before they reach our servers."
+                title="Encrypted storage"
+                description="Files are encrypted with AES and RSA before they are stored; downloads stay password-gated."
               />
               <FeatureCard
                 icon={<LinkIcon className="h-6 w-6" />}
@@ -207,7 +241,10 @@ export default async function LandingPage() {
       </main>
 
       <footer className="border-t border-border/60 py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} SecureShare
+        <p>© {new Date().getFullYear()} {APP_NAME}</p>
+        <p className="mt-1 font-mono text-xs text-muted-foreground/80">
+          {APP_NAME_SLUG}
+        </p>
       </footer>
     </div>
   );
